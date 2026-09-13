@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Glassmorphism Calculator with Logo Background</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* CSS Variables & Theme Setup */
+        :root {
+            --glass-bg: rgba(15, 23, 42, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            
+            --btn-bg: rgba(255, 255, 255, 0.04);
+            --btn-hover: rgba(255, 255, 255, 0.1);
+            --btn-active: rgba(255, 255, 255, 0.18);
+            
+            --accent-blue: #38bdf8;
+            --accent-purple: #c084fc;
+            --neon-glow: 0 0 15px rgba(56, 189, 248, 0.4);
+            --equals-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+        }
+
+        [data-theme="light"] {
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            
+            --btn-bg: rgba(0, 0, 0, 0.03);
+            --btn-hover: rgba(0, 0, 0, 0.06);
+            --btn-active: rgba(0, 0, 0, 0.1);
+            
+            --accent-blue: #0284c7;
+            --accent-purple: #9333ea;
+            --neon-glow: 0 0 15px rgba(2, 132, 199, 0.2);
+            --equals-gradient: linear-gradient(135deg, #0284c7 0%, #7c3aed 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: color 0.3s ease, border 0.3s ease;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #0b0f19;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated Logo Background Layer */
+        .logo-bg-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .logo-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: blur(8px) brightness(0.6);
+            transform: scale(1.1);
+            animation: logoPulse 8s ease-in-out infinite alternate;
+        }
+
+        /* Dark overlay to make calculator pop out nicely */
+        .bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 15, 25, 0.65);
+            z-index: 1;
+        }
+
+        @keyframes logoPulse {
+            0% {
+                transform: scale(1.1) rotate(0deg);
+                filter: blur(8px) brightness(0.5);
+            }
+            100% {
+                transform: scale(1.2) rotate(1deg);
+                filter: blur(6px) brightness(0.7);
+            }
+        }
+
+        /* Calculator Card Styling (Glassmorphism) */
+        .calculator-container {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            z-index: 2;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tool-btn {
+            background: var(--btn-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .tool-btn:hover {
+            background: var(--btn-hover);
+            color: var(--accent-blue);
+            box-shadow: var(--neon-glow);
+        }
+
+        /* Display */
+        .display {
+            background: var(--btn-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: right;
+            word-break: break-all;
+            word-wrap: break-word;
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .previous-operand {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            min-height: 20px;
+        }
+
+        .current-operand {
+            color: var(--text-primary);
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+
+        /* Keypad Grid */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .btn {
+            background: var(--btn-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            padding: 16px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: var(--btn-hover);
+            border-color: var(--accent-blue);
+            box-shadow: var(--neon-glow);
+        }
+
+        .btn:active {
+            background: var(--btn-active);
+            transform: scale(0.95);
+        }
+
+        .btn.function {
+            color: var(--accent-purple);
+            font-weight: 600;
+        }
+
+        .btn.operator {
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .btn.equals {
+            background: var(--equals-gradient);
+            color: #ffffff;
+            font-weight: bold;
+            border: none;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn.equals:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 20px var(--accent-purple);
+        }
+
+        /* History Drawer Styles */
+        .history-drawer {
+            position: absolute;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            border-radius: 24px 0 0 24px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow);
+        }
+
+        .history-drawer.active {
+            left: -295px;
+        }
+
+        @media (max-width: 768px) {
+            .history-drawer.active {
+                left: 0;
+                width: 100%;
+                border-radius: 24px;
+            }
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .history-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-item {
+            background: var(--btn-bg);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: right;
+            border: 1px solid var(--glass-border);
+        }
+
+        .history-item .hist-result {
+            color: var(--text-primary);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .no-history {
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 50px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Scaling for Mobiles */
+        @media (max-width: 480px) {
+            .calculator-container {
+                max-width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                border: none;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+                padding: 20px;
+            }
+            
+            .keypad {
+                gap: 10px;
+            }
+            
+            .btn {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-bg-container">
+        <img src="channels4_profile.jpg" alt="Noor YT Logo Background" class="logo-bg">
+    </div>
+    <div class="bg-overlay"></div>
+
+    <div class="calculator-container">
+        <div class="toolbar">
+            <button id="theme-toggle" class="tool-btn" title="Toggle Dark/Light Mode">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <button id="history-toggle" class="tool-btn" title="View History">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+            </button>
+            <button id="copy-btn" class="tool-btn" title="Copy Result">
+                <i class="fa-solid fa-copy"></i>
+            </button>
+        </div>
+
+        <div class="display">
+            <div id="previous-operand" class="previous-operand"></div>
+            <div id="current-operand" class="current-operand">0</div>
+        </div>
+
+        <div class="keypad">
+            <button class="btn function" data-action="clear">AC</button>
+            <button class="btn function" data-action="delete">⌫</button>
+            <button class="btn function" data-action="percent">%</button>
+            <button class="btn operator" data-action="divide">÷</button>
+
+            <button class="btn number" data-number="7">7</button>
+            <button class="btn number" data-number="8">8</button>
+            <button class="btn number" data-number="9">9</button>
+            <button class="btn operator" data-action="multiply">×</button>
+
+            <button class="btn number" data-number="4">4</button>
+            <button class="btn number" data-number="5">5</button>
+            <button class="btn number" data-number="6">6</button>
+            <button class="btn operator" data-action="subtract">-</button>
+
+            <button class="btn number" data-number="1">1</button>
+            <button class="btn number" data-number="2">2</button>
+            <button class="btn number" data-number="3">3</button>
+            <button class="btn operator" data-action="add">+</button>
+
+            <button class="btn function" data-action="toggle-sign">±</button>
+            <button class="btn number" data-number="0">0</button>
+            <button class="btn number" data-number=".">.</button>
+            <button class="btn equals" data-action="calculate">=</button>
+        </div>
+    </div>
+
+    <div id="history-drawer" class="history-drawer">
+        <div class="history-header">
+            <h3>History</h3>
+            <button id="clear-history" class="tool-btn"><i class="fa-solid fa-trash"></i></button>
+        </div>
+        <div id="history-list" class="history-list">
+            <p class="no-history">No history yet</p>
+        </div>
+    </div>
+
+    <script>
+        class Calculator {
+            constructor(previousOperandElement, currentOperandElement) {
+                this.previousOperandElement = previousOperandElement;
+                this.currentOperandElement = currentOperandElement;
+                this.clear();
+            }
+
+            clear() {
+                this.currentOperand = '0';
+                this.previousOperand = '';
+                this.operation = undefined;
+                this.resetScreen = false;
+            }
+
+            delete() {
+                if (this.resetScreen) return;
+                if (this.currentOperand === 'Error') {
+                    this.clear();
+                    return;
+                }
+                if (this.currentOperand.length === 1 || (this.currentOperand.length === 2 && this.currentOperand.startsWith('-'))) {
+                    this.currentOperand = '0';
+                } else {
+                    this.currentOperand = this.currentOperand.toString().slice(0, -1);
+                }
+            }
+
+            appendNumber(number) {
+                if (this.resetScreen) {
+                    this.currentOperand = '';
+                    this.resetScreen = false;
+                }
+                if (number === '.' && this.currentOperand.includes('.')) return;
+                if (this.currentOperand === '0' && number !== '.') {
+                    this.currentOperand = number.toString();
+                } else {
+                    this.currentOperand = this.currentOperand.toString() + number.toString();
+                }
+            }
+
+            chooseOperation(operation) {
+                if (this.currentOperand === 'Error') return;
+                if (this.currentOperand === '') return;
+                if (this.previousOperand !== '') {
+                    this.compute();
+                }
+                this.operation = operation;
+                this.previousOperand = this.currentOperand;
+                this.currentOperand = '';
+            }
+
+            compute() {
+                let computation;
+                const prev = parseFloat(this.previousOperand);
+                const current = parseFloat(this.currentOperand);
+                if (isNaN(prev) || isNaN(current)) return;
+
+                switch (this.operation) {
+                    case '+':
+                        computation = prev + current;
+                        break;
+                    case '-':
+                        computation = prev - current;
+                        break;
+                    case '*':
+                        computation = prev * current;
+                        break;
+                    case '÷':
+                        if (current === 0) {
+                            this.showError("Cannot divide by 0");
+                            return;
+                        }
+                        computation = prev / current;
+                        break;
+                    default:
+                        return;
+                }
+
+                computation = Math.round(computation * 10000000000) / 10000000000;
+                
+                const historyString = `${this.formatDisplayNumber(prev)} ${this.operation} ${this.formatDisplayNumber(current)} =`;
+                
+                this.currentOperand = computation.toString();
+                this.addHistory(historyString, this.currentOperand);
+
+                this.operation = undefined;
+                this.previousOperand = '';
+                this.resetScreen = true;
+            }
+
+            percent() {
+                if (this.currentOperand === '0' || this.currentOperand === 'Error') return;
+                const current = parseFloat(this.currentOperand);
+                this.currentOperand = (current / 100).toString();
+            }
+
+            toggleSign() {
+                if (this.currentOperand === '0' || this.currentOperand === 'Error') return;
+                if (this.currentOperand.startsWith('-')) {
+                    this.currentOperand = this.currentOperand.slice(1);
+                } else {
+                    this.currentOperand = '-' + this.currentOperand;
+                }
+            }
+
+            showError(message) {
+                this.currentOperand = 'Error';
+                this.previousOperand = message;
+                this.resetScreen = true;
+            }
+
+            formatDisplayNumber(number) {
+                if (number === '') return '';
+                const stringNumber = number.toString();
+                const integerDigits = parseFloat(stringNumber.split('.')[0]);
+                const decimalDigits = stringNumber.split('.')[1];
+                let integerDisplay;
+                
+                if (isNaN(integerDigits)) {
+                    integerDisplay = '';
+                } else {
+                    integerDisplay = integerDigits.toLocaleString('en', { maximumFractionDigits: 0 });
+                }
+                
+                if (decimalDigits != null) {
+                    return `${integerDisplay}.${decimalDigits}`;
+                } else {
+                    return integerDisplay;
+                }
+            }
+
+            updateDisplay() {
+                if (this.currentOperand === 'Error') {
+                    this.currentOperandElement.innerText = 'Error';
+                    this.previousOperandElement.innerText = this.previousOperand;
+                    return;
+                }
+                
+                this.currentOperandElement.innerText = this.formatDisplayNumber(this.currentOperand);
+                if (this.operation != null) {
+                    this.previousOperandElement.innerText = `${this.formatDisplayNumber(this.previousOperand)} ${this.operation}`;
+                } else {
+                    this.previousOperandElement.innerText = '';
+                }
+            }
+
+            addHistory(expression, result) {
+                const historyList = document.getElementById('history-list');
+                const noHistory = historyList.querySelector('.no-history');
+                if (noHistory) noHistory.remove();
+
+                const historyItem = document.createElement('div');
+                historyItem.classList.add('history-item');
+                historyItem.innerHTML = `
+                    <div>${expression}</div>
+                    <div class="hist-result">${result}</div>
+                `;
+                historyList.prepend(historyItem);
+            }
+        }
+
+        const previousOperandElement = document.getElementById('previous-operand');
+        const currentOperandElement = document.getElementById('current-operand');
+        const calculator = new Calculator(previousOperandElement, currentOperandElement);
+
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('click', () => {
+                if (button.classList.contains('number')) {
+                    calculator.appendNumber(button.dataset.number);
+                } else if (button.classList.contains('operator')) {
+                    const actionMap = { add: '+', subtract: '-', multiply: '*', divide: '÷' };
+                    calculator.chooseOperation(actionMap[button.dataset.action]);
+                } else if (button.classList.contains('equals') || button.dataset.action === 'calculate') {
+                    calculator.compute();
+                } else if (button.dataset.action === 'clear') {
+                    calculator.clear();
+                } else if (button.dataset.action === 'delete') {
+                    calculator.delete();
+                } else if (button.dataset.action === 'percent') {
+                    calculator.percent();
+                } else if (button.dataset.action === 'toggle-sign') {
+                    calculator.toggleSign();
+                }
+                calculator.updateDisplay();
+            });
+        });
+
+        window.addEventListener('keydown', e => {
+            if ((e.key >= '0' && e.key <= '9') || e.key === '.') {
+                calculator.appendNumber(e.key);
+            } else if (e.key === '+' || e.key === '-') {
+                calculator.chooseOperation(e.key);
+            } else if (e.key === '*') {
+                calculator.chooseOperation('*');
+            } else if (e.key === '/') {
+                e.preventDefault();
+                calculator.chooseOperation('÷');
+            } else if (e.key === 'Enter' || e.key === '=') {
+                e.preventDefault();
+                calculator.compute();
+            } else if (e.key === 'Backspace') {
+                calculator.delete();
+            } else if (e.key.toLowerCase() === 'c') {
+                calculator.clear();
+            }
+            calculator.updateDisplay();
+        });
+
+        const themeToggle = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            htmlElement.setAttribute('data-theme', newTheme);
+            themeToggle.innerHTML = newTheme === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
+        });
+
+        const historyToggle = document.getElementById('history-toggle');
+        const historyDrawer = document.getElementById('history-drawer');
+
+        historyToggle.addEventListener('click', () => {
+            historyDrawer.classList.toggle('active');
+        });
+
+        document.getElementById('clear-history').addEventListener('click', () => {
+            document.getElementById('history-list').innerHTML = '<p class="no-history">No history yet</p>';
+        });
+
+        const copyBtn = document.getElementById('copy-btn');
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = currentOperandElement.innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                copyBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i>';
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
